@@ -13,22 +13,21 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
+  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   DateTime? _selectedDateTime;
   Duration _remainingTime = Duration.zero;
   Timer? _timer;
   List<PendingNotificationRequest> _pendingNotifications = [];
-  int _notificationId = 0;
 
   @override
   void initState() {
     super.initState();
-    _initializeNotifications();
+    initializeNotifications();
     _checkPendingNotifications();
   }
 
-  void _initializeNotifications() {
-    _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  void initializeNotifications() {
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -36,13 +35,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
     const InitializationSettings initializationSettings =
         InitializationSettings(android: androidSettings);
 
-    _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
-
   Future<void> _scheduleNotification(DateTime scheduledTime) async {
-    _notificationId++;
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
+    final int notificationId = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'channel_id',
       'channel_name',
       importance: Importance.max,
@@ -53,33 +51,61 @@ class _NotificationScreenState extends State<NotificationScreen> {
       android: androidDetails,
     );
 
-    await _flutterLocalNotificationsPlugin.zonedSchedule(
-      _notificationId,
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      notificationId,
       'Scheduled Notification',
       'This notification is scheduled for ${scheduledTime.toString()}',
       tz.TZDateTime.from(scheduledTime, tz.local),
       notificationDetails,
       uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
+      UILocalNotificationDateInterpretation.absoluteTime,
       androidScheduleMode: AndroidScheduleMode.alarmClock,
+      matchDateTimeComponents: DateTimeComponents.time, // Optional for daily
     );
 
     _checkPendingNotifications();
     _startCountdown(scheduledTime);
   }
 
+  // Future<void> _scheduleNotification(DateTime scheduledTime) async {
+  //   const AndroidNotificationDetails androidDetails =
+  //       AndroidNotificationDetails(
+  //     'channel_id',
+  //     'channel_name',
+  //     importance: Importance.max,
+  //     priority: Priority.high,
+  //   );
+  //
+  //   const NotificationDetails notificationDetails = NotificationDetails(
+  //     android: androidDetails,
+  //   );
+  //
+  //   await flutterLocalNotificationsPlugin.zonedSchedule(
+  //     9,
+  //     'Scheduled Notification',
+  //     'This notification is scheduled for ${scheduledTime.toString()}',
+  //     tz.TZDateTime.from(scheduledTime, tz.local),
+  //     notificationDetails,
+  //     uiLocalNotificationDateInterpretation:
+  //         UILocalNotificationDateInterpretation.absoluteTime,
+  //     androidScheduleMode: AndroidScheduleMode.alarmClock,
+  //   );
+  //
+  //   _checkPendingNotifications();
+  //   _startCountdown(scheduledTime);
+  // }
+
   Future<void> _checkPendingNotifications() async {
     final pendingNotifications =
-        await _flutterLocalNotificationsPlugin.pendingNotificationRequests();
+        await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+
     setState(() {
       _pendingNotifications = pendingNotifications;
+      if (_pendingNotifications.isEmpty) {
+        _resetCountdown();
+        _selectedDateTime = null;
+      }
     });
-
-    if (pendingNotifications.isNotEmpty && _selectedDateTime != null) {
-      _startCountdown(_selectedDateTime!);
-    } else {
-      _resetCountdown();
-    }
   }
 
   void _startCountdown(DateTime scheduledTime) {
@@ -112,12 +138,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   void _cancelNotification(int id) async {
-    await _flutterLocalNotificationsPlugin.cancel(id);
+    await flutterLocalNotificationsPlugin.cancel(id);
     _checkPendingNotifications();
   }
 
   void _cancelAllNotifications() async {
-    await _flutterLocalNotificationsPlugin.cancelAll();
+    await flutterLocalNotificationsPlugin.cancelAll();
     _checkPendingNotifications();
   }
 
@@ -216,7 +242,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
             const SizedBox(height: 20),
             _buildActionButtons(),
             const SizedBox(height: 20),
-            _buildPendingNotificationsList(),
+            _pendingNotifications.isEmpty
+                ? const Center(
+                    child: Text('There is no pending notification'),
+                  )
+                : _buildPendingNotificationsList(),
           ],
         ),
       ),
@@ -277,7 +307,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return ElevatedButton.icon(
       onPressed: () {
         LocalNotificationService.showBasicNotification(
-          5,
+          1,
           'Instant Notification',
           'The body of the notification',
         );
@@ -378,31 +408,34 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget _buildPendingNotificationsList() {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: _pendingNotifications.length,
-      itemBuilder: (context, index) {
-        final notification = _pendingNotifications[index];
-        return Card(
-          color: Colors.blue[100],
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          child: ListTile(
-            title: Text(
-              'Scheduled for ${_formatDateTime(_selectedDateTime!)}',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+    return SizedBox(
+      width: 300,
+      height: 300,
+      child: ListView.builder(
+        itemCount: _pendingNotifications.length,
+        itemBuilder: (context, index) {
+          final notification = _pendingNotifications[index];
+          return Card(
+            color: Colors.blue[100],
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            child: ListTile(
+              title: Text(
+                'Scheduled Notification ID: ${notification.id}',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.cancel, color: Colors.red),
+                onPressed: () {
+                  _cancelNotification(notification.id);
+                },
               ),
             ),
-            trailing: IconButton(
-              icon: const Icon(Icons.cancel, color: Colors.red),
-              onPressed: () {
-                _cancelNotification(notification.id!);
-              },
-            ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

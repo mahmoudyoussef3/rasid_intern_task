@@ -43,7 +43,7 @@ class LocalNotificationService {
       ),
     );
     await flutterLocalNotificationsPlugin.periodicallyShow(
-      20,
+      2,
       'this is repeated Notification',
       'Repeated notification every minute',
       RepeatInterval.everyMinute,
