@@ -4,7 +4,8 @@ This Flutter app is designed with three primary functionalities:
 
 1. **Portfolio Generator**: Users can input their details, generate a portfolio in both Arabic and English, and save, view, or share it.
 2. **Location Fetcher**: Users can fetch their location using a Google Maps link, coordinates, or their current location.
-3. **Notification Manager**: Users can set instant, repeated, or scheduled notifications. Notifications can also be canceled individually by ID or all at once, with pending notifications displayed.
+3. **Notification Manager**: Users can set instant, repeated, or scheduled notifications. Notifications can also be canceled individually by ID or all at once, with pending notifications displayed. 
+###(please provide internet for packages.)
 
 ## Features
 
