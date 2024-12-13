@@ -35,21 +35,18 @@ class LocalNotificationService {
   static void repeatedNotification() async {
     NotificationDetails details = const NotificationDetails(
       android: AndroidNotificationDetails(
-        'repeatedid',
-        'Default repeatedid Channel',
-        importance: Importance.max,
-        priority: Priority.high,
-        enableVibration: true,
+        'default_notification_channel_id',
+        'Default Notification Channel',
       ),
     );
     await flutterLocalNotificationsPlugin.periodicallyShow(
       2,
-      'this is repeated Notification',
+      'This is repeated Notification',
       'Repeated notification every minute',
       RepeatInterval.everyMinute,
       details,
       payload: 'payloadData',
-      androidScheduleMode: AndroidScheduleMode.alarmClock,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
   }
 }

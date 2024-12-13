@@ -2,19 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rasid_intern_taks/Features/location/widgets/build_action_button.dart';
-import 'package:rasid_intern_taks/Features/location/widgets/build_card.dart';
 import 'package:rasid_intern_taks/Features/location/widgets/build_coordinates_input_card.dart';
 import 'package:rasid_intern_taks/Features/location/widgets/build_maps_input_card.dart';
 import 'package:rasid_intern_taks/Features/location/widgets/build_title_section.dart';
 import '../cubit/location_cubit.dart';
 import '../cubit/location_state.dart';
 
-class LocationFetcherScreen extends StatelessWidget {
-  final TextEditingController _mapsLinkController = TextEditingController();
-  final TextEditingController _latController = TextEditingController();
-  final TextEditingController _longController = TextEditingController();
-
+class LocationFetcherScreen extends StatefulWidget {
   LocationFetcherScreen({super.key});
+
+  @override
+  State<LocationFetcherScreen> createState() => _LocationFetcherScreenState();
+}
+
+class _LocationFetcherScreenState extends State<LocationFetcherScreen> {
+  final TextEditingController _mapsLinkController = TextEditingController();
+
+  final TextEditingController _latController = TextEditingController();
+
+  final TextEditingController _longController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    context.read<LocationCubit>().checkLocationPermissions();
+  }
 
   @override
   Widget build(BuildContext context) {

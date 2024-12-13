@@ -49,6 +49,8 @@ dependencies:
   bloc: ^8.1.4
   flutter_bloc: ^8.1.6
   permission_handler: ^11.3.1
+  http: ^1.2.2
+  one_clock: ^2.0.1
 
 dev_dependencies:
   flutter_test:

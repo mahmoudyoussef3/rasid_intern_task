@@ -56,7 +56,10 @@ class BuildCoordinatesInputCard extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.search, color: Colors.blueAccent),
+            icon: const Icon(Icons.search, color: Colors.white),
+            style: ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(Colors.blue[800])
+            ),
             onPressed: () => cubit.getLocationFromCoordinates(
               double.tryParse(latController.text) ?? 0.0,
               double.tryParse(longController.text) ?? 0.0,

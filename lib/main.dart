@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:rasid_intern_taks/Features/location/cubit/location_cubit.dart';
 import 'package:rasid_intern_taks/Features/Notifications/local_notification_service.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -13,11 +12,11 @@ main() async {
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Africa/Cairo'));
   await LocalNotificationService.init();
-  runApp(const RasidTask());
+  runApp(const RASIDTask());
 }
 
-class RasidTask extends StatelessWidget {
-  const RasidTask({super.key});
+class RASIDTask extends StatelessWidget {
+  const RASIDTask({super.key});
 
   @override
   Widget build(BuildContext context) {

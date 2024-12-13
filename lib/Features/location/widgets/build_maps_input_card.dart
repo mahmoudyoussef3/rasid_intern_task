@@ -27,9 +27,15 @@ class BuildMapsInputCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: Colors.blue, width: 2),
           ),
-          suffixIcon: IconButton(
-            icon: Icon(Icons.search, color: Colors.blue[800]),
-            onPressed: () => cubit.getLocationFromLink(mapsLinkController.text),
+          suffixIcon: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              icon: const Icon(Icons.search, color: Colors.white),
+              style: ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Colors.blue[800])),
+              onPressed: () =>
+                  cubit.extractCoordinatesFromLink(mapsLinkController.text),
+            ),
           ),
         ),
       ),

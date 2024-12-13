@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'location_state.dart';
+import 'package:http/http.dart' as http;
 
 class LocationCubit extends Cubit<LocationState> {
   LocationCubit() : super(LocationInitial());
@@ -10,7 +11,7 @@ class LocationCubit extends Cubit<LocationState> {
     emit(LocationLoading());
 
     try {
-      await _checkLocationPermissions();
+      await checkLocationPermissions();
 
       final position = await Geolocator.getCurrentPosition();
 
@@ -58,53 +59,48 @@ class LocationCubit extends Cubit<LocationState> {
     }
   }
 
-  Future<void> getLocationFromLink(String link) async {
-    emit(LocationLoading());
-
+  Future<String?> resolveRedirect(String url) async {
     try {
-      final coordinates = _extractCoordinatesFromLink(link);
-      if (coordinates == null) {
-        throw Exception('Could not extract coordinates from the link');
+      final response = await http.head(Uri.parse(url));
+      if (response.isRedirect) {
+        return response.headers['location'];
       }
-
-      await getLocationFromCoordinates(coordinates[0], coordinates[1]);
+      return null;
     } catch (e) {
-      emit(LocationFailure(errorMessage: e.toString()));
+      emit(LocationFailure(
+          errorMessage: 'Failed to resolve redirect: ${e.toString()}'));
+      return null;
     }
   }
 
-  List<double>? _extractCoordinatesFromLink(String link) {
-    print('Link: $link');
-    final patterns = [
-      RegExp(r'@([-.\d]+),([-.\d]+)'),
-      RegExp(r'q=([-.\d]+),([-.\d]+)'),
-      RegExp(r'([-.\d]+)[,\s]+([-.\d]+)'),
-    ];
-
-    for (var pattern in patterns) {
-      final match = pattern.firstMatch(link);
-      if (match != null) {
-        print('Pattern: $pattern, Match: ${match.group(0)}');
-        final lat = double.tryParse(match.group(1)!);
-        final lng = double.tryParse(match.group(2)!);
-        if (lat != null && lng != null) {
-          print('Coordinates: $lat, $lng');
-          return [lat, lng];
-        }
+  Future<void> extractCoordinatesFromLink(String url) async {
+    emit(LocationLoading());
+    try {
+      if (url.contains('maps.app.goo.gl')) {
+        url = await resolveRedirect(url) ?? url;
       }
-    }
 
-    print('No matching pattern found for the link: $link');
-    return null;
+      final regex = RegExp(r'@([-.\d]+),([-.\d]+)');
+      final match = regex.firstMatch(url);
+      if (match != null) {
+        final lat = double.parse(match.group(1)!);
+        final lng = double.parse(match.group(2)!);
+
+        await getLocationFromCoordinates(lat, lng);
+      } else {
+        emit(LocationFailure(
+            errorMessage: 'Invalid URL: No coordinates found.'));
+      }
+    } catch (e) {
+      emit(LocationFailure(
+          errorMessage: 'Failed to extract coordinates: ${e.toString()}'));
+    }
   }
 
-  Future<void> _checkLocationPermissions() async {
-    if (!await Geolocator.isLocationServiceEnabled()) {
-      throw Exception('Location services are disabled');
-    }
-
+  Future<void> checkLocationPermissions() async {
     var permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
+      await Geolocator.requestPermission();
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         throw Exception('Location permissions are denied');

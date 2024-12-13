@@ -209,7 +209,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               crossAxisAlignment: _selectedLanguage == Language.english
                   ? pw.CrossAxisAlignment.start
                   : pw.CrossAxisAlignment.end,
-              children: _buildPortfolioSections(arabicFont, englishFont),
+              children: _buildPortfolioSections(arabicFont),
             ),
           ),
         ],
@@ -226,7 +226,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     await Printing.layoutPdf(onLayout: (format) async => pdf.save());
   }
 
-  List<pw.Widget> _buildPortfolioSections(var arabicFont, var englishFont) {
+  List<pw.Widget> _buildPortfolioSections(var arabicFont) {
     final personalInfoController = _selectedLanguage == Language.english
         ? _enPersonalInfoController
         : _arPersonalInfoController;
@@ -246,8 +246,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     final textDirection = _selectedLanguage == Language.english
         ? pw.TextDirection.ltr
         : pw.TextDirection.rtl;
-    final textFont =
-        _selectedLanguage == Language.english ? englishFont : arabicFont;
+    final textFont = arabicFont;
     final sectionTitles = _selectedLanguage == Language.english
         ? [
             'Personal Information',
