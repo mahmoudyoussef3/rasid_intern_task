@@ -21,7 +21,6 @@ class RASIDTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(scaffoldBackgroundColor: Colors.blue[50]),
       debugShowCheckedModeBanner: false,
       home: MultiBlocProvider(providers: [
         BlocProvider(create: (context) => LocationCubit()),

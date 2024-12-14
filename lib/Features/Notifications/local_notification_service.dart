@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class LocalNotificationService {
   static FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -17,7 +19,7 @@ class LocalNotificationService {
     );
   }
 
-  static void showBasicNotification(int id, String title, String body) async {
+  static void showBasicNotification() async {
     NotificationDetails details = const NotificationDetails(
       android: AndroidNotificationDetails(
         'default_notification_channel_id',
@@ -27,7 +29,8 @@ class LocalNotificationService {
         enableVibration: true,
       ),
     );
-    await flutterLocalNotificationsPlugin.show(id, title, body, details,
+    await flutterLocalNotificationsPlugin.show(
+        1, 'Instant Notification', 'The body of the notification', details,
         payload: 'payloadData');
   }
 
@@ -36,6 +39,8 @@ class LocalNotificationService {
       android: AndroidNotificationDetails(
         'default_notification_channel_id',
         'Default Notification Channel',
+        importance: Importance.max,
+        priority: Priority.high,
       ),
     );
     await flutterLocalNotificationsPlugin.periodicallyShow(
@@ -47,5 +52,25 @@ class LocalNotificationService {
       payload: 'payloadData',
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
+  }
+
+  void cancelNotification(int id) async {
+    await LocalNotificationService.flutterLocalNotificationsPlugin.cancel(id);
+  }
+
+  void cancelAllNotifications() async {
+    await LocalNotificationService.flutterLocalNotificationsPlugin.cancelAll();
+  }
+
+  Future<void> requestNotificationPermission() async {
+    final status = await Permission.notification.request();
+    if (status.isGranted) {
+      debugPrint("Notification permission granted.");
+    } else {
+      debugPrint("Notification permission denied.");
+      if (status.isPermanentlyDenied) {
+        openAppSettings();
+      }
+    }
   }
 }

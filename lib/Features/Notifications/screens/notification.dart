@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:one_clock/one_clock.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:rasid_intern_taks/Features/Notifications/widgets/build_notification_button.dart';
+import 'package:rasid_intern_taks/Features/Notifications/widgets/show_analog_clock.dart';
 import 'package:timezone/timezone.dart' as tz;
 import '../local_notification_service.dart';
 
@@ -16,26 +17,14 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   DateTime? _selectedDateTime;
-  List<PendingNotificationRequest> _pendingNotifications = [];
+  List _pendingNotifications = [];
+  int scheduledNotificationId = 3;
 
   @override
   void initState() {
     super.initState();
-    _requestNotificationPermission();
-    _checkPendingNotifications();
-    LocalNotificationService.init();
-  }
-
-  Future<void> _requestNotificationPermission() async {
-    final status = await Permission.notification.request();
-    if (status.isGranted) {
-      debugPrint("Notification permission granted.");
-    } else {
-      debugPrint("Notification permission denied.");
-      if (status.isPermanentlyDenied) {
-        openAppSettings();
-      }
-    }
+    LocalNotificationService().requestNotificationPermission();
+    getPendingNotifications();
   }
 
   Future<void> _scheduleNotification(DateTime scheduledTime) async {
@@ -50,7 +39,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     await LocalNotificationService.flutterLocalNotificationsPlugin
         .zonedSchedule(
-      3,
+      scheduledNotificationId++,
       'Scheduled Notification',
       'This notification is scheduled for ${scheduledTime.toString()}',
       tz.TZDateTime.from(scheduledTime, tz.local),
@@ -60,17 +49,53 @@ class _NotificationScreenState extends State<NotificationScreen> {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       payload: 'payloadData',
     );
-
-    _checkPendingNotifications();
+    exampleUsage();
   }
 
-  Future<void> _checkPendingNotifications() async {
-    final pendingNotifications = await LocalNotificationService
-        .flutterLocalNotificationsPlugin
-        .pendingNotificationRequests();
-    setState(() {
-      _pendingNotifications = pendingNotifications;
-    });
+  Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+    try {
+      final pendingNotifications = await LocalNotificationService
+          .flutterLocalNotificationsPlugin
+          .pendingNotificationRequests();
+      setState(() {
+        _pendingNotifications = pendingNotifications;
+      });
+      return pendingNotifications;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<bool> hasPendingNotifications() async {
+    final pendingNotifications = await getPendingNotifications();
+    return pendingNotifications.isNotEmpty;
+  }
+
+  Future<void> printPendingNotificationsDetails() async {
+    final pendingNotifications = await getPendingNotifications();
+
+    if (pendingNotifications.isEmpty) {
+      if (kDebugMode) {
+        print('No pending notifications.');
+      }
+      return;
+    }
+
+    print('Pending Notifications Details:');
+    for (var notification in pendingNotifications) {
+      print('---');
+      print('ID: ${notification.id}');
+      print('Title: ${notification.title}');
+      print('Body: ${notification.body}');
+      print('Payload: ${notification.payload}');
+    }
+  }
+
+  void exampleUsage() async {
+    bool hasPending = await hasPendingNotifications();
+    print('Has pending notifications: $hasPending');
+
+    await printPendingNotificationsDetails();
   }
 
   Future<void> _pickDateTime() async {
@@ -100,6 +125,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
         if (_selectedDateTime!.isAfter(DateTime.now())) {
           _scheduleNotification(_selectedDateTime!);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Notification scheduled at $_selectedDateTime')),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Please select a future time!')),
@@ -113,7 +142,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: _buildBody(),
+      body: SingleChildScrollView(child: _buildBody()),
     );
   }
 
@@ -146,44 +175,23 @@ class _NotificationScreenState extends State<NotificationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildClock(),
+            const ShowAnalogClock(),
             const SizedBox(height: 20),
             _buildActionButtons(),
             const SizedBox(height: 20),
             _buildClearAllNotificationsButton(),
             const SizedBox(height: 20),
             _pendingNotifications.isEmpty
-                ? const Center(child: Text('There is no pending notification'))
+                ? const SizedBox(
+                    height: 300,
+                    child: Center(
+                        child: Text(
+                      'There is no pending notification',
+                      style: TextStyle(fontSize: 24),
+                    )))
                 : _buildPendingNotificationsList(),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildClock() {
-    return SizedBox(
-      height: 200,
-      child: AnalogClock(
-        digitalClockColor: Colors.white,
-        tickColor: Colors.white,
-        secondHandColor: Colors.white,
-        decoration: BoxDecoration(
-          border: Border.all(width: 2.0, color: Colors.blue[800]!),
-          color: Colors.transparent,
-          shape: BoxShape.circle,
-        ),
-        width: 150.0,
-        isLive: true,
-        hourHandColor: Colors.blue[800]!,
-        minuteHandColor: Colors.blue[800]!,
-        showSecondHand: true,
-        numberColor: Colors.blue[800]!,
-        showNumbers: true,
-        showAllNumbers: true,
-        showTicks: true,
-        showDigitalClock: true,
-        datetime: DateTime.now(),
       ),
     );
   }
@@ -208,84 +216,52 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget _buildInstantNotificationButton() {
-    return _buildNotificationButton('Instant', Icons.notification_important,
-        () {
-      LocalNotificationService.showBasicNotification(
-        1,
-        'Instant Notification',
-        'The body of the notification',
-      );
-    }, 1);
+    return BuildNotificationButton(
+        label: 'Instant',
+        icon: Icons.notification_important,
+        onPressed: () {
+          LocalNotificationService.showBasicNotification();
+        },
+        id: 1);
   }
 
   Widget _buildRepeatedNotificationButton() {
-    return _buildNotificationButton('Repeated', Icons.repeat, () {
-      LocalNotificationService.repeatedNotification();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.white,
-          content: Text(
-            'Notification repeated every minute',
-            style: TextStyle(
-                color: Colors.blue[800],
-                fontWeight: FontWeight.w600,
-                fontSize: 14),
-          ),
-        ),
-      );
-    }, 2);
+    return BuildNotificationButton(
+        label: 'Repeated',
+        icon: Icons.repeat,
+        onPressed: () {
+          LocalNotificationService.repeatedNotification();
+          getPendingNotifications();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.white,
+              content: Text(
+                'Notification repeated every minute',
+                style: TextStyle(
+                    color: Colors.blue[800],
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14),
+              ),
+            ),
+          );
+        },
+        id: 2);
   }
 
   Widget _buildScheduleNotificationButton() {
-    return _buildNotificationButton(
-        'Schedule', Icons.schedule, _pickDateTime, 3);
-  }
-
-  Widget _buildNotificationButton(
-      String label, IconData icon, VoidCallback onPressed, int id) {
-    return Column(
-      children: [
-        ElevatedButton.icon(
-          onPressed: onPressed,
-          icon: Icon(icon, color: Colors.white),
-          label: Text(
-            label,
-            style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue[800],
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-        ElevatedButton.icon(
-          onPressed: () {
-            _cancelNotification(id);
-          },
-          icon: const Icon(Icons.cancel, color: Colors.white),
-          label: Text(
-            'Cancel',
-            style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red[800],
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        )
-      ],
-    );
+    return BuildNotificationButton(
+        label: 'Schedule',
+        icon: Icons.schedule,
+        onPressed: _pickDateTime,
+        id: 3);
   }
 
   Widget _buildClearAllNotificationsButton() {
     return ElevatedButton.icon(
-      onPressed: _cancelAllNotifications,
+      onPressed: () {
+        LocalNotificationService().cancelAllNotifications();
+        getPendingNotifications();
+      },
       icon: const Icon(Icons.clear_all, color: Colors.white),
       label: Text(
         'Clear All',
@@ -305,7 +281,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget _buildPendingNotificationsList() {
     return SizedBox(
       width: 300,
-      height: 100,
+      height: 300,
       child: ListView.builder(
         itemCount: _pendingNotifications.length,
         itemBuilder: (context, index) {
@@ -322,7 +298,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
               trailing: IconButton(
                 icon: const Icon(Icons.cancel, color: Colors.red),
                 onPressed: () {
-                  _cancelNotification(notification.id);
+                  LocalNotificationService()
+                      .cancelNotification(notification.id);
+                  getPendingNotifications();
                 },
               ),
             ),
@@ -330,15 +308,5 @@ class _NotificationScreenState extends State<NotificationScreen> {
         },
       ),
     );
-  }
-
-  void _cancelNotification(int id) async {
-    await LocalNotificationService.flutterLocalNotificationsPlugin.cancel(id);
-    _checkPendingNotifications();
-  }
-
-  void _cancelAllNotifications() async {
-    await LocalNotificationService.flutterLocalNotificationsPlugin.cancelAll();
-    _checkPendingNotifications();
   }
 }
