@@ -98,6 +98,7 @@ class LocationCubit extends Cubit<LocationState> {
   }
 
   Future<void> checkLocationPermissions() async {
+    Geolocator.requestPermission();
     var permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       await Geolocator.requestPermission();

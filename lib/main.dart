@@ -22,9 +22,9 @@ class RASIDTask extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MultiBlocProvider(providers: [
-        BlocProvider(create: (context) => LocationCubit()),
-      ], child: const ManagerScreen()),
-    );
+      home:
+        BlocProvider(create: (context) => LocationCubit(),
+       child: const ManagerScreen()));
+
   }
 }

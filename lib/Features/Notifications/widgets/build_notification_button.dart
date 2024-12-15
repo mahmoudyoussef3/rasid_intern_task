@@ -9,51 +9,39 @@ class BuildNotificationButton extends StatelessWidget {
       required this.icon,
       required this.onPressed,
       required this.label,
+      required this.color,
       required this.id});
   final String label;
   final IconData icon;
   final VoidCallback onPressed;
   final int id;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ElevatedButton.icon(
-          onPressed: onPressed,
-          icon: Icon(icon, color: Colors.white),
-          label: Text(
-            label,
-            style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue[800],
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+    return Container(
+      width: MediaQuery.of(context).size.width / 4,
+      decoration:
+          BoxDecoration(color: color, borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: onPressed,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: Colors.white,
+              ),
+              Text(
+                label,
+                style: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.bold, color: Colors.white),
+              )
+            ],
           ),
         ),
-        ElevatedButton.icon(
-          onPressed: () {
-            LocalNotificationService().cancelNotification(id);
-          },
-          icon: const Icon(Icons.cancel, color: Colors.white),
-          label: Text(
-            'Cancel',
-            style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red[800],
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        )
-      ],
+      ),
     );
   }
 }

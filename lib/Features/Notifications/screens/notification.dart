@@ -156,18 +156,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ),
       ),
       centerTitle: true,
-      backgroundColor: Colors.blue[800],
+      backgroundColor: Colors.indigo,
       elevation: 0,
     );
   }
 
   Widget _buildBody() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.blue[200]!, Colors.blue[50]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          colors: [Colors.indigo, Colors.blueAccent],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
       ),
       child: Padding(
@@ -176,18 +176,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const ShowAnalogClock(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             _buildActionButtons(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             _buildClearAllNotificationsButton(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             _pendingNotifications.isEmpty
-                ? const SizedBox(
+                ? SizedBox(
                     height: 300,
                     child: Center(
                         child: Text(
                       'There is no pending notification',
-                      style: TextStyle(fontSize: 24),
+                      style: GoogleFonts.montserrat(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     )))
                 : _buildPendingNotificationsList(),
           ],
@@ -199,17 +202,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget _buildActionButtons() {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
-      height: 130,
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        scrollDirection: Axis.horizontal,
+      height: 75,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildInstantNotificationButton(),
-          const VerticalDivider(color: Colors.white),
           _buildRepeatedNotificationButton(),
-          const VerticalDivider(color: Colors.white),
           _buildScheduleNotificationButton(),
-          const VerticalDivider(color: Colors.white),
         ],
       ),
     );
@@ -217,43 +216,48 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Widget _buildInstantNotificationButton() {
     return BuildNotificationButton(
-        label: 'Instant',
-        icon: Icons.notification_important,
-        onPressed: () {
-          LocalNotificationService.showBasicNotification();
-        },
-        id: 1);
+      label: 'Instant',
+      icon: Icons.notification_important,
+      onPressed: () {
+        LocalNotificationService.showBasicNotification();
+      },
+      id: 1,
+      color: const Color(0xff4caf50),
+    );
   }
 
   Widget _buildRepeatedNotificationButton() {
     return BuildNotificationButton(
-        label: 'Repeated',
-        icon: Icons.repeat,
-        onPressed: () {
-          LocalNotificationService.repeatedNotification();
-          getPendingNotifications();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: Colors.white,
-              content: Text(
-                'Notification repeated every minute',
-                style: TextStyle(
-                    color: Colors.blue[800],
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14),
+      label: 'Repeated',
+      icon: Icons.repeat,
+      onPressed: () {
+        LocalNotificationService.repeatedNotification();
+        getPendingNotifications();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text(
+              'Notification repeated every minute',
+              style: TextStyle(
+                color: Colors.white,
               ),
             ),
-          );
-        },
-        id: 2);
+          ),
+        );
+      },
+      id: 2,
+      color: const Color(0xffFD9600),
+    );
   }
 
   Widget _buildScheduleNotificationButton() {
     return BuildNotificationButton(
-        label: 'Schedule',
-        icon: Icons.schedule,
-        onPressed: _pickDateTime,
-        id: 3);
+      label: 'Schedule',
+      icon: Icons.schedule,
+      onPressed: _pickDateTime,
+      id: 3,
+      color: const Color(0xff2195f1),
+    );
   }
 
   Widget _buildClearAllNotificationsButton() {
@@ -269,7 +273,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             fontWeight: FontWeight.bold, color: Colors.white),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue[800],
+        backgroundColor: Colors.redAccent,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -286,23 +290,48 @@ class _NotificationScreenState extends State<NotificationScreen> {
         itemCount: _pendingNotifications.length,
         itemBuilder: (context, index) {
           final notification = _pendingNotifications[index];
-          return Card(
-            color: Colors.blue[100],
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            child: ListTile(
-              title: Text(
-                'Scheduled Notification ID: ${notification.id}',
-                style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-              trailing: IconButton(
-                icon: const Icon(Icons.cancel, color: Colors.red),
-                onPressed: () {
-                  LocalNotificationService()
-                      .cancelNotification(notification.id);
-                  getPendingNotifications();
-                },
-              ),
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Scheduled Notification',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Notification ID: ${notification.id}}',
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  onPressed: () {
+                    LocalNotificationService()
+                        .cancelNotification(notification.id);
+                    getPendingNotifications();
+                  },
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                ),
+              ],
             ),
           );
         },

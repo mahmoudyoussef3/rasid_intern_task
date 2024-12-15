@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+
 class BuildCardWidget extends StatelessWidget {
-  const BuildCardWidget({super.key,
-  required this.title,
-  required this.subtitle,
-  required this.child,
-   });
+  const BuildCardWidget({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.child,
+  });
   final String title;
   final String subtitle;
   final Widget child;
@@ -23,10 +25,10 @@ class BuildCardWidget extends StatelessWidget {
           children: [
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.blue[800],
+                color: Color(0xff2195f1),
               ),
             ),
             const SizedBox(height: 5),
@@ -34,7 +36,7 @@ class BuildCardWidget extends StatelessWidget {
               subtitle,
               style: const TextStyle(
                 fontSize: 14,
-                color: Colors.grey,
+                color: Color(0xffFD9600),
               ),
             ),
             const SizedBox(height: 15),

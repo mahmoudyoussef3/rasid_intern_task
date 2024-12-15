@@ -5,7 +5,7 @@ class BuildTitleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Column(
         children: [
           Row(
@@ -16,20 +16,20 @@ class BuildTitleSection extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue[800],
+                  color: Colors.white,
                 ),
               ),
               Icon(
                 Icons.location_on,
                 size: 30,
-                color: Colors.blue[800],
+                color: Colors.white,
               ),
             ],
           ),
-          const SizedBox(height: 5),
+          SizedBox(height: 5),
           Text(
             "Enter coordinates or a link, or fetch directly!",
-            style: TextStyle(fontSize: 16, color: Colors.blue[800]),
+            style: TextStyle(fontSize: 16, color: Colors.white),
           ),
         ],
       ),

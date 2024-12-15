@@ -45,7 +45,7 @@ dependencies:
   url_launcher: ^6.3.1
   timezone: ^0.10.0
   google_fonts: ^6.2.1
-  syncfusion_flutter_pdfviewer: ^27.2.5
+  syncfusion_flutter_pdfviewer: ^28.1.33
   bloc: ^8.1.4
   flutter_bloc: ^8.1.6
   permission_handler: ^11.3.1

@@ -18,7 +18,7 @@ class BuildMapsInputCard extends StatelessWidget {
         controller: mapsLinkController,
         decoration: InputDecoration(
           hintText: "Enter Google Maps link",
-          prefixIcon: Icon(Icons.map, color: Colors.blue[800]),
+          prefixIcon: const Icon(Icons.map, color: Color(0xff2195f1)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.blue[800]!),
@@ -31,8 +31,8 @@ class BuildMapsInputCard extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: IconButton(
               icon: const Icon(Icons.search, color: Colors.white),
-              style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(Colors.blue[800])),
+              style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(Color(0xff2195f1))),
               onPressed: () =>
                   cubit.extractCoordinatesFromLink(mapsLinkController.text),
             ),

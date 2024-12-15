@@ -47,45 +47,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.blue[800],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Select Language: ',
-                style: TextStyle(color: Colors.white),
-              ),
-              ChoiceChip(
-                label: const Text('English'),
-                selected: _selectedLanguage == Language.english,
-                onSelected: (selected) {
-                  setState(() {
-                    _selectedLanguage = Language.english;
-                  });
-                },
-              ),
-              const SizedBox(width: 10),
-              ChoiceChip(
-                label: const Text('Arabic'),
-                selected: _selectedLanguage == Language.arabic,
-                onSelected: (selected) {
-                  setState(() {
-                    _selectedLanguage = Language.arabic;
-                  });
-                },
-              ),
-            ],
-          ),
-        ),
+        backgroundColor: Colors.indigo,
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue[100]!, Colors.blue[50]!],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            colors: [Colors.indigo, Colors.blueAccent],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
         child: Padding(
@@ -94,19 +63,66 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             key: _formKey,
             child: ListView(
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Select Language: ',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    ChoiceChip(
+                      checkmarkColor: Colors.white,
+                      label: const Text(
+                        'English',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      selected: _selectedLanguage == Language.english,
+                      selectedColor:
+                          const Color(0xff4caf50), // Sky blue for selection
+                      backgroundColor:
+                          const Color(0xFFBBDEFB), // Light blue background
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedLanguage = Language.english;
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 10),
+                    ChoiceChip(
+                      label: const Text(
+                        'Arabic',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      selected: _selectedLanguage == Language.arabic,
+                      selectedColor: const Color(0xff4caf50),
+                      checkmarkColor: Colors.white,
+                      backgroundColor: const Color(0xFFBBDEFB),
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedLanguage = Language.arabic;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 24,
+                ),
                 _selectedLanguage == Language.english
                     ? BuildEnglishForm(
                         enContactController: _enContactController,
                         enExperienceController: _enExperienceController,
                         enEducationController: _enEducationController,
                         enSkillsController: _enSkillsController,
-                        enPersonalInfoController: _enPersonalInfoController)
+                        enPersonalInfoController: _enPersonalInfoController,
+                      )
                     : BuildArabicForm(
                         arContactController: _arContactController,
                         arPersonalInfoController: _arPersonalInfoController,
                         arExperienceController: _arExperienceController,
                         arEducationController: _arEducationController,
-                        arSkillsController: _arSkillsController),
+                        arSkillsController: _arSkillsController,
+                      ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   onPressed: generatePDF,
@@ -127,8 +143,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           ),
                         ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[800],
+                    backgroundColor: Color(0xff4caf50), // Deep blue for buttons
                     padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -147,8 +166,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[600],
+                    backgroundColor: const Color(
+                        0xffFD9600
+                        ), // Sky blue for secondary button
                     padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ],

@@ -29,20 +29,32 @@ class BuildTextField extends StatelessWidget {
           : TextAlign.left,
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: const TextStyle(
+          color: Color(0xFF3949AB), // Deep blue for the label
+          fontWeight: FontWeight.bold,
+        ),
         hintText: hint,
-        prefixIcon: Icon(icon, color: Colors.blue[800]),
+        hintStyle: TextStyle(color: Colors.grey.shade600),
+        prefixIcon:
+            Icon(icon, color: const Color(0xff2195f1)), // Sky blue for the icon
+        filled: true,
+        fillColor: Colors.white, // Light blue background
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blue),
+          borderSide: const BorderSide(color: Colors.transparent),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.blue[300]!),
+          borderSide: const BorderSide(color: Colors.transparent),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.blue[800]!, width: 2),
+          borderSide: const BorderSide(
+              color: Color(0xFF3949AB), width: 2), // Deep blue border
         ),
+      ),
+      style: const TextStyle(
+        color: Colors.black, // Input text color
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {

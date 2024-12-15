@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:one_clock/one_clock.dart';
+
 class ShowAnalogClock extends StatelessWidget {
   const ShowAnalogClock({super.key});
 
@@ -10,20 +11,20 @@ class ShowAnalogClock extends StatelessWidget {
       child: AnalogClock(
         digitalClockColor: Colors.white,
         tickColor: Colors.white,
-        secondHandColor: Colors.white,
+        secondHandColor: Colors.redAccent,
         decoration: BoxDecoration(
-          border: Border.all(width: 2.0, color: Colors.blue[800]!),
+          border: Border.all(width: 2.0, color: Colors.white),
           color: Colors.transparent,
           shape: BoxShape.circle,
         ),
         width: 150.0,
         isLive: true,
-        hourHandColor: Colors.blue[800]!,
-        minuteHandColor: Colors.blue[800]!,
+        hourHandColor: Colors.white,
+        minuteHandColor: Colors.white,
         showSecondHand: true,
-        numberColor: Colors.blue[800]!,
         showNumbers: true,
         showAllNumbers: true,
+        numberColor: Colors.white,
         showTicks: true,
         showDigitalClock: true,
         datetime: DateTime.now(),

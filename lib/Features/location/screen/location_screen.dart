@@ -39,7 +39,7 @@ class _LocationFetcherScreenState extends State<LocationFetcherScreen> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blue[800],
+        backgroundColor: Colors.indigo,
         elevation: 0,
       ),
       body: BlocProvider(
@@ -54,11 +54,11 @@ class _LocationFetcherScreenState extends State<LocationFetcherScreen> {
             final cubit = context.read<LocationCubit>();
 
             return Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.blue[200]!, Colors.blue[50]!],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                  colors: [Colors.indigo, Colors.blueAccent],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
               ),
               child: SingleChildScrollView(
@@ -98,7 +98,7 @@ class _LocationFetcherScreenState extends State<LocationFetcherScreen> {
     if (state is LocationLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
         ),
       );
     } else if (state is LocationSuccess) {
@@ -180,22 +180,25 @@ class _LocationFetcherScreenState extends State<LocationFetcherScreen> {
         ),
       );
     } else {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.info_outline, color: Colors.blue, size: 40),
-            SizedBox(height: 8),
-            Text(
-              "No location data available",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.blue,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+      return const SizedBox(
+        height: 400,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(Icons.info_outline, color: Color(0xffFD9600), size: 40),
+              SizedBox(height: 8),
+              Text(
+                "No location data available",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xffFD9600),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }

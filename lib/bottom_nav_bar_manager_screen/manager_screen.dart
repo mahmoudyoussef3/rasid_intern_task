@@ -21,7 +21,10 @@ class _ManagerScreenState extends State<ManagerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.blue[800],
+        backgroundColor: Colors.blueAccent,
+        elevation: 0,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white70,
         items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.picture_as_pdf), label: 'Portfolio'),
@@ -32,8 +35,6 @@ class _ManagerScreenState extends State<ManagerScreen> {
               label: 'Notifications'),
         ],
         currentIndex: _selectedTab,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.black,
         onTap: (value) {
           setState(() {
             _selectedTab = value;
