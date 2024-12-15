@@ -13,7 +13,7 @@ This Flutter app is designed with three primary functionalities:
 
 ### 1. Portfolio Generator
 
-![Portfolio Generator](./screen_shots/porfolio_generator.jpg)
+![Portfolio Generator](./screen_shots/portfolio_generator.jpg)
 - Input details such as:
     - Full Name
     - Contact Information
